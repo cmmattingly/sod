@@ -1,0 +1,1 @@
+# initialize outlier detection folder as module
