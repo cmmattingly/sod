@@ -23,32 +23,40 @@ from models.Doc2VecTransformer import Doc2VecTransformer
 MAX_TOPICS = 15
 
 def tfidf_extract(docs):
+    print("Extracting TF-IDF Features...")
+
     vectorizer = TfidfVectorizer()
     feature_vectors = vectorizer.fit_transform(docs)
-    np.save("data/vectorized/tfidf_vectors", feature_vectors.toarray())
+
+    return feature_vectors.toarray()
 
 def doc2vec_extract(docs):
+    print("Extracting Doc2Vec Features...")
+
     model = Doc2VecTransformer().fit(docs)
     feature_vectors = model.transform(docs)
-    np.save("data/vectorized/doc2vec_vectors", feature_vectors)
+
+    return feature_vectors
 
 def lda_extract(docs):
-    # lda preprocessing
+    print("Extracting LDA Features...")
+
+    # lda pre-processing
     tokenizer = regexp.RegexpTokenizer(r"\w+")
     texts = list(map(lambda x: tuple(tokenizer.tokenize(x)), docs))
-    corpus = list(map(lambda x: id2word.doc2bow(x), texts))
     id2word = corpora.Dictionary(texts)
+    corpus = list(map(lambda x: id2word.doc2bow(x), texts))
 
     # define function for coherence optimization (find best number of topics)
     def coherence_optimization(dictionary, corpus, texts, limit=MAX_TOPICS, start=5, step=5):
         model_list, coherence_values = [], []
         for num_topics in tqdm(range(start, limit, step)):
-            model = LdaMallet(path_to_mallet_binary, corpus=corpus, num_topics=num_topics, id2word=id2word)
+            model = LdaMallet(os.environ['MALLET_DIR'], corpus=corpus, num_topics=num_topics, id2word=id2word)
             coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_npmi')
             
             model_list.append(model)
             coherence_values.append(coherencemodel.get_coherence())
-    return model_list, coherence_values
+        return model_list, coherence_values
 
     # perform coherence optimization
     model_list, coherence_values = coherence_optimization(dictionary=id2word, corpus=corpus, texts=texts)
@@ -58,20 +66,20 @@ def lda_extract(docs):
     # create document topic matrix
     doc_top_matrix = np.array([*model.load_document_topics()])
 
-    np.save("data/vectorized/lda_vectors", doc_top_matrix)
+    return doc_top_matrix
 
 def main():
     # get processed senator statements
     # [TODO-3] Change statements to fetched statements for senator analysis
 
     sen_statements = pd.read_csv("data/processed/sen_statements.csv")
-    processed_statements = sen_statements['text']
+    processed_statements = sen_statements['text'].values.astype('U')
 
     feature_extractors = [tfidf_extract, doc2vec_extract, lda_extract]
 
     for feature_extractor in feature_extractors:
         vectorized = feature_extractor(processed_statements)
-        np.save(f"data/vectorized/{feature_extractor.__name__.split('_')[0]}_vectors")
+        np.save(f"data/vectorized/{feature_extractor.__name__.split('_')[0]}_vectors", vectorized)
 
 if __name__ == "__main__":
     main()

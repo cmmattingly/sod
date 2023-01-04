@@ -32,10 +32,7 @@ def clean_text(s):
 
 def process_text(text):
     # clean unprocessed data using clean_text function
-    try:
-        text = clean_text(text)
-    except:
-        print(text)
+    text = clean_text(text)
     
     # word tokenize data entry -> remove tokens in stop words and that are one character long
     text_tokens = tokenize.word_tokenize(text)
@@ -82,7 +79,7 @@ def main():
     except Exception as e:
         sen_statements = merge_sen_statements()
 
-    # [TODO-3] REMOVE drop na 
+    # [TODO-3] REMOVE drop na (no documents should be NA from )
     sen_statements = sen_statements.dropna()
 
     # use tqdm pandas for progress apply
@@ -91,6 +88,10 @@ def main():
     print('Processing Text...')
     process_lambda = lambda row: process_text(row['text'])
     sen_statements['text'] = sen_statements.progress_apply(process_lambda, axis=1)
+
+    # drop NA due to possibly empty documents after processing (only stop words, etc.)
+    sen_statements = sen_statements.dropna()
+    print(sen_statements.isnull().sum())
 
     df_to_csv(sen_statements, path="data/processed/sen_statements.csv", verbose=True)
 
