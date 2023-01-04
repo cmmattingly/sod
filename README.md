@@ -93,7 +93,7 @@ The feature extraction script should be the only script needed to get started ru
 ### Feature Extraction
 Run the following script to extract features from senator statments already created within this github repo:
 ```bash
-python3 src/data/extract_features.
+python3 src/data/extract_features.py
 ```
 
 ### Notebook
@@ -116,7 +116,7 @@ python3 src/data/get_doc_urls.py
 ```
 
 ### Scraping
-The src/scraping directory contains scripts to both scrape senator metadata (name, party, state, etc.) and senator statments. The scrape_sen_metadata.py script should not be used unless the ProPublica API is down.
+The src/scraping directory contains scripts to both scrape senator metadata (name, party, state, etc.) and senator statements. The scrape_sen_metadata.py script should not be used unless the ProPublica API is down.
 
 Run the following command to scrape senator statements (if you need to update statements):
 ```bash

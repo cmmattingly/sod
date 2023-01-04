@@ -1,14 +1,14 @@
 import os
+os.chdir(os.environ['PROJECT_DIRECTORY'])
+
 import requests
 import pandas as pd
 import json
 from tqdm import tqdm 
 
 from utils.helpers import handle_get_request, df_to_csv
-from utils.config import PROPUBLICA_KEY, PROJECT_DIRECTORY
-os.chdir(PROJECT_DIRECTORY)
 
-HEADERS = {"X-API-KEY": PROPUBLICA_KEY}
+HEADERS = {"X-API-KEY": os.environ['PROPUBLICA_KEY']}
 MAX_DOCS = 100
 
 # parse response from statements request
