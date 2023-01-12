@@ -1,6 +1,6 @@
 # set pythonpath and project directory environment variables
 export PYTHONPATH="$PWD/src"
-export PROJECT_DIRECTORY="$PWD"
+export PROJECT_DIR="$PWD"
 export MALLET_DIR="/Users/chasemattingly/mallet-2.0.6/bin/mallet"
 
 

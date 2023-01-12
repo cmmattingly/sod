@@ -1,5 +1,5 @@
 import os
-os.chdir(os.environ['PROJECT_DIRECTORY'])
+os.chdir(os.environ['PROJECT_DIR'])
 
 import pandas as pd
 import json

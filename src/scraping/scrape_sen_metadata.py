@@ -3,7 +3,6 @@
 import pandas as pd
 import json
 import re
-import argparse
 
 # scraping
 from bs4 import BeautifulSoup
@@ -33,7 +32,7 @@ if __name__ == "__main__":
     args = parse_args()
     path = args.path
 
-    # get soup object and obtain data from said object
+    # scrape html content using BeautifulSoup
     soup = get_soup(SENATE_URL)
     data = soup.find("table", {"id": "listOfSenators"}).find('tbody').findAll('tr')
     

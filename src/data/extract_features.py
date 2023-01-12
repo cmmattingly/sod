@@ -1,10 +1,13 @@
 import os
-os.chdir(os.environ['PROJECT_DIRECTORY'])
+os.chdir(os.environ['PROJECT_DIR'])
 
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import multiprocessing as mp
+import argparse
+
+from sentence_transformers import SentenceTransformer
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.base import BaseEstimator
@@ -22,21 +25,29 @@ from models.Doc2VecTransformer import Doc2VecTransformer
 
 MAX_TOPICS = 15
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--test', nargs='?', const=True, type=bool, default=False)
+    parser.add_argument('--id', nargs='?', type=str, default='ALL')
+    args = parser.parse_args()
+
+    return args
+
 def tfidf_extract(docs):
     print("Extracting TF-IDF Features...")
 
     vectorizer = TfidfVectorizer()
-    feature_vectors = vectorizer.fit_transform(docs)
+    doc_embeddings = vectorizer.fit_transform(docs)
 
-    return feature_vectors.toarray()
+    return doc_embeddings.toarray()
 
 def doc2vec_extract(docs):
     print("Extracting Doc2Vec Features...")
 
     model = Doc2VecTransformer().fit(docs)
-    feature_vectors = model.transform(docs)
+    doc_embeddings = model.transform(docs)
 
-    return feature_vectors
+    return doc_embeddings
 
 def lda_extract(docs):
     print("Extracting LDA Features...")
@@ -68,18 +79,48 @@ def lda_extract(docs):
 
     return doc_top_matrix
 
+def bert_extract(docs):
+    # https://huggingface.co/docs/transformers/model_doc/bert
+    # Use transformers instead of sentence transformers
+    print("Extracting BERT Features...")
+
+    sbert_model_distilro = SentenceTransformer('all-distilroberta-v1')
+    doc_embeddings = sbert_model_distilro.encode(docs)
+
+    return doc_embeddings
+
 def main():
-    # get processed senator statements
-    # [TODO-3] Change statements to fetched statements for senator analysis
+    args = parse_args()
+    test = args.test
+    member_id = args.id
 
-    sen_statements = pd.read_csv("data/processed/sen_statements.csv")
-    processed_statements = sen_statements['text'].values.astype('U')
+    # get processed data (either test or senator statements) + define path for saving embeddings
+    if test:
+        df = pd.read_csv("data/processed/test_dataset.csv")
+        path_prefix = "data/vectorized/test_dataset/" 
+    else:
+        df = pd.read_csv("data/processed/sen_statements.csv")
+        path_prefix = f"data/vectorized/sen_statements/id={member_id}/"  
+    
+    try:
+        os.mkdir(path_prefix)
+    except OSError as e:
+        print(f"{path_prefix} already exists. Will overwrite existing vectorized statements.")
 
-    feature_extractors = [tfidf_extract, doc2vec_extract, lda_extract]
+    # if member id is default ('ALL') use all rows -- else use specific member id
+    processed_statements = (
+        df['text'].values.astype('U') 
+        if member_id == 'ALL'
+        else df[df.member_id == member_id]['text'].values.astype('U'))
 
+    # loop through different feature extractors
+    feature_extractors = [tfidf_extract, doc2vec_extract, bert_extract]
     for feature_extractor in feature_extractors:
-        vectorized = feature_extractor(processed_statements)
-        np.save(f"data/vectorized/{feature_extractor.__name__.split('_')[0]}_vectors", vectorized)
+        # extract features using current custom function 
+        doc_embeddings = feature_extractor(processed_statements)
+
+        # save embeddings using feature extractor function name
+        np.save(path_prefix + f"{feature_extractor.__name__.split('_')[0]}_vectors", doc_embeddings)
 
 if __name__ == "__main__":
     main()

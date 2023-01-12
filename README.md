@@ -96,10 +96,16 @@ Run the following script to extract features from senator statments already crea
 python3 src/data/extract_features.py
 ```
 
-### Notebook
-Run the following command to perform analysis (outlier detection) on data:
+### Notebooks
+Run the following command to view analysis (outlier detection) on test dataset -- with truth labels:
 ```bash
-jupyer notebook notebooks/{version_number}-outlier-detection.ipynb
+jupyter notebook notebooks/{version_number}-outlier-detection-exploration.ipynb
+```
+
+Run the following command to view analysis on senator statements dataset -- no truth labels:
+Note: This repo may be updated with truth label data once the project is taken over (content analysis team).
+```bash
+jupyter notebook notebooks/{version_number}-sen-outlier-detection.ipynb
 ```
 
 ### ProPublica API

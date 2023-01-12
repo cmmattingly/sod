@@ -10,7 +10,7 @@
 
 
 import os
-os.chdir(os.environ['PROJECT_DIRECTORY'])
+os.chdir(os.environ['PROJECT_DIR'])
 
 import re
 import pandas as pd
@@ -52,12 +52,9 @@ def find_missing_ids(true_ids):
     parse_id = lambda x: x.split('=')[1].split('.')[0]
     
     # parse ids from documents directory
-    found_ids = [
-        parse_id(file_name) 
-        for file_name in os.listdir(DOCUMENTS_DIR)
-    ]
+    found_ids = [parse_id(file_name) for file_name in os.listdir(DOCUMENTS_DIR)]
    
-    # find ids that are missing
+    # use set arithmetic to determine missing ids
     missing_ids = list(set(true_ids) - set(found_ids))
     
     return missing_ids
@@ -65,6 +62,7 @@ def find_missing_ids(true_ids):
 def scrape_senator(df, member_id):
     urls = df[df.member_id == member_id]['url'].to_list()
 
+    # define local function for multiprocessing
     def scrape_url(url):
         # scrape max 2*n urls per second (n = # of processes)
         time.sleep(1)
@@ -73,6 +71,7 @@ def scrape_senator(df, member_id):
         if not validate_url(url):
             return ''
 
+        # use random user agent for each url
         headers = {'User-Agent': UserAgent().random}
         # try cached version first
         try:
@@ -87,18 +86,20 @@ def scrape_senator(df, member_id):
                 print(e)
                 return ''
 
+        # start scraping response html content
         soup = BeautifulSoup(response.content, features='lxml')
-        re_parse = re.compile('<.*?>')
+        exp = re.compile('<.*?>')
 
-        # get text from concatenating paragraph elements
+        # create full text from concatenating paragraph elements' text
         text = ''.join([
             para.get_text()
             for para in soup.findAll('p') 
-            if (re_parse.search(str(para)))
+            if (exp.search(str(para)))
         ])
 
         return text
     
+    # scrape urls using multiprocessing
     with Pool(processes=2) as pool:
         texts = pool.map(scrape_url, urls)
 
@@ -119,6 +120,7 @@ def main():
     for i, member_id in enumerate(tqdm(missing_ids)):
         urls, texts = scrape_senator(sen_urls, member_id)
 
+        # create and save dataframe using scraped data and urls scraped
         df = pd.DataFrame(list(zip(urls, texts)), columns=['url', 'text'])
         df_to_csv(df, path=f"data/raw/documents/senator_statements_id={member_id}.csv", verbose=True)
 

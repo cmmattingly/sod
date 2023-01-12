@@ -5,7 +5,7 @@ import json
 from tqdm import tqdm 
 
 from helpers import handle_get_request, df_to_csv
-os.chdir(os.environ['PROJECT_DIRECTORY'])
+os.chdir(os.environ['PROJECT_DIR'])
 
 HEADERS = {"X-API-KEY": os.environ['PROPUBLICA_KEY']}
 MEMBERS_ENDPOINT = "https://api.propublica.org/congress/v1/117/senate/members.json"

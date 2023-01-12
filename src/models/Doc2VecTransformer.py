@@ -7,6 +7,7 @@ from sklearn.base import BaseEstimator
 from sklearn import utils as skl_utils
 from gensim.models.doc2vec import TaggedDocument, Doc2Vec
 
+# custom BaseEstimator for training Doc2Vec model and transforming text data
 class Doc2VecTransformer(BaseEstimator):
     def __init__(self, vector_size=100, learning_rate=0.01, epochs=20):
         self.learning_rate = learning_rate
