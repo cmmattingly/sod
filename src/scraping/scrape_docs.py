@@ -1,5 +1,5 @@
 # Note:
-# There are no rules against scraping of the website, receiving a 403 error is due to the scripts the government computer system
+# There are no rules against scraping of the senator website, receiving a 403 error is due to the scripts the government computer system
 # employs to monitor network traffic to identify unauthorized attempts to upload or change information, or otherwise cause damage.
 
 # Senate.gov regulations -- https://www.senate.gov/general/privacy.htm:
@@ -53,7 +53,7 @@ def find_missing_ids(true_ids):
     
     # parse ids from documents directory
     found_ids = [parse_id(file_name) for file_name in os.listdir(DOCUMENTS_DIR)]
-   
+    
     # use set arithmetic to determine missing ids
     missing_ids = list(set(true_ids) - set(found_ids))
     
@@ -122,6 +122,7 @@ def main():
 
         # create and save dataframe using scraped data and urls scraped
         df = pd.DataFrame(list(zip(urls, texts)), columns=['url', 'text'])
+        df = df.dropna()
         df_to_csv(df, path=f"data/raw/documents/senator_statements_id={member_id}.csv", verbose=True)
 
         if not i == 0 and not (i % 5):

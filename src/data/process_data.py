@@ -61,7 +61,8 @@ def process_text(text):
 
 # [TODO-3] Remove when using fetched statements
 def merge_sen_statements():
-    # [TODO-1]: Take into account date scraped when making corpus
+    # [TODO]: Take into account date scraped when making corpus
+    
     # merge csv files together using filenames from glob.glob
     file_names = [file_name for file_name in glob.glob(f"data/raw/sen_statements/*.csv")]
     sen_statements = pd.concat([pd.read_csv(file_name) for file_name in file_names])
@@ -69,9 +70,8 @@ def merge_sen_statements():
     # get senator statement url meta data
     sen_urls = pd.read_csv("data/raw/sen_urls.csv")
 
-    # merge url metadata and text using url column
+    # merge and save dataframe
     final_df = pd.merge(sen_urls, sen_statements, on='url')
-    
     df_to_csv(final_df, "data/raw/sen_statements.csv", verbose=True) 
 
     return final_df
@@ -80,8 +80,7 @@ def main():
     # get test argument for determining what dataset to process
     args = parse_args()
     test = args.test
-
-    # [TODO-3] Process fetched statements instead of local ones     
+         
     if test:
         df = pd.read_csv("data/utils/test_dataset.csv")
     else:
@@ -89,9 +88,6 @@ def main():
             df = pd.read_csv("data/raw/sen_statements.csv")
         except Exception as e:
             df = merge_sen_statements()
-
-    # [TODO-3] REMOVE drop na (no documents should be NA from database)
-    df = df.dropna()
 
     # use tqdm pandas progress apply
     print('Processing Text...')

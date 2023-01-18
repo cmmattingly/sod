@@ -97,15 +97,16 @@ def main():
     # get processed data (either test or senator statements) + define path for saving embeddings
     if test:
         df = pd.read_csv("data/processed/test_dataset.csv")
-        path_prefix = "data/vectorized/test_dataset/" 
+        final_path_prefix = "data/vectorized/test_dataset/" 
     else:
         df = pd.read_csv("data/processed/sen_statements.csv")
-        path_prefix = f"data/vectorized/sen_statements/id={member_id}/"  
+        final_path_prefix = f"data/vectorized/sen_statements/id={member_id}/"  
     
+    # make directory to store senator vectorized statements - if it exists we will override vectorized statements
     try:
-        os.mkdir(path_prefix)
+        os.mkdir(final_path_prefix)
     except OSError as e:
-        print(f"{path_prefix} already exists. Will overwrite existing vectorized statements.")
+        print(f"{final_path_prefix} already exists. Will overwrite existing vectorized statements.")
 
     # if member id is default ('ALL') use all rows -- else use specific member id
     processed_statements = (
@@ -116,11 +117,8 @@ def main():
     # loop through different feature extractors
     feature_extractors = [tfidf_extract, doc2vec_extract, bert_extract]
     for feature_extractor in feature_extractors:
-        # extract features using current custom function 
         doc_embeddings = feature_extractor(processed_statements)
-
-        # save embeddings using feature extractor function name
-        np.save(path_prefix + f"{feature_extractor.__name__.split('_')[0]}_vectors", doc_embeddings)
+        np.save(final_path_prefix + f"{feature_extractor.__name__.split('_')[0]}_vectors", doc_embeddings)
 
 if __name__ == "__main__":
     main()
