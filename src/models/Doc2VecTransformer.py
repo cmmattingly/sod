@@ -33,7 +33,7 @@ class Doc2VecTransformer(BaseEstimator):
             model.alpha -= self.lr
             model.min_alpha = model.alpha
         
-        # store model for transforming
+        # store model for transforming and return Doc2VecTransfomer
         self._model = model
         return self
 

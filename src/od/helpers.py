@@ -9,7 +9,8 @@ import numpy as np
 from pyod.models.copod import COPOD
 from pyod.models.abod import ABOD
 from pyod.models.lof import LOF
-from sklearn.metrics.pairwise import cosine_similarity, cosine_distances
+import sklearn.metrics.pairwise as pairwise
+from sklearn.neighbors import LocalOutlierFactor
 
 import umap.umap_ as umap
 from sklearn.decomposition import PCA
@@ -35,13 +36,30 @@ def abod(X):
     scores = detector.decision_scores_
     return scores
 
-def ncsod(X):
-    # get pairwise cosine similarities
-    cosine_matrix = cosine_similarity(X, X)
-    # remove same vector pairs in calculation (diagnols=1)
+def csod(X):
+    '''
+    Custom cosine similarity based outlier detection
+
+    Steps:
+
+    1. Compute Pairwise cosine similarities of all vectors
+    2. Fill diagnol of matrix with zeros (so they aren't included in the final calculation)
+    3. Compute mean of each row - each represents the similarity of vector n with others
+
+    Returns
+    ------
+    np.array
+        similarity scores - lower the score, higher the outlier
+    '''
+    cosine_matrix = pairwise.cosine_similarity(X, X)
     np.fill_diagonal(cosine_matrix, 0)
-    # get the normalized sum of each row
-    scores = [sum(row) / len(X) for row in cosine_matrix]
+    scores = np.mean(cosine_matrix, axis=1)
+
+    return scores
+
+def lof(X, n_neighbors=20):
+    clf = LocalOutlierFactor(n_neighbors=n_neighbors, contamination=0.1).fit(X)
+    scores = clf.negative_outlier_factor_
 
     return scores
 
@@ -63,7 +81,7 @@ def reduce_vectors(feature_vectors, reduce_method, dimension):
     Parameters
     ----------
     feature_vectors : np.array
-        vector of vectors with different types of document embeddings (bert, tfidf, etc.)
+        vector of vectors with different types of document embeddings e.g, [bert_embeddings, tfidf_embeddings, ...]
     reduce_method : function
         python function for dimensionality reduction on each set of feature vectors
     dimension: int
@@ -83,7 +101,7 @@ def test_outliers(feature_vectors, od_method):
     Parameters
     ----------
     feature_vectors : np.array
-        vector of vectors with different types of document embeddings (bert, tfidf, etc.)
+        vector of vectors with different types of document embeddings e.g, [bert_embeddings, tfidf_embeddings, ...>
     od_method : function
         python function for outlier detection on each set of feature vectors
 

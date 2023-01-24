@@ -1,4 +1,6 @@
 # THIS FILE IS FOR IF PROPUBLICA API DOESN'T WORK
+import os
+os.chdir(os.environ['PROJECT_DIR'])
 
 import pandas as pd
 import json
@@ -15,7 +17,7 @@ HEADERS = {'User-Agent':
 SENATE_URL = "https://www.senate.gov/senators/index.htm"
 
 # read in state abbreviations
-with open('../data/state_abbreviations.txt') as f:
+with open('data/utils/state_abbreviations.txt') as f:
     data = f.read()
     us_state_abbrev = json.loads(data)
 

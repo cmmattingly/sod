@@ -3,9 +3,9 @@
 Description of project
 
 ## Prerequisites
-This project requires Python 3 and pip to install required packages using requirements.txt.
-
-You will also need to have software installed to run and execute a Jupyter Notebook.
+1. python3
+2. jupyter notbeook
+3. Mallet on machine: https://mallet.cs.umass.edu/download.php
 
 ## Getting Started
 
@@ -40,51 +40,61 @@ source setup.sh
 .
 ├── README.md
 ├── data
-│   ├── interim
+│   ├── fetched
+│   │   └── docs.csv
 │   ├── processed
-│   │   └── sen_statements.csv
+│   │   ├── sen_statements.csv
+│   │   └── test_dataset.csv
 │   ├── raw
 │   │   ├── sen_metadata.csv
 │   │   ├── sen_statements
 │   │   │   └── senator_statements_id=*.csv
+│   │   ├── sen_statements.csv
 │   │   └── sen_urls.csv
 │   ├── utils
-│   │   └── state_abbreviations.txt
+│   │   ├── sen-id_to_member-id.json
+│   │   ├── state_abbreviations.txt
+│   │   └── test_dataset.csv
 │   └── vectorized
+│       ├── sen_statements
+│       │   ├── id=*
+│       │   │   ├── bert_vectors.npy
+│       │   │   ├── doc2vec_vectors.npy
+│       │   │   ├── lda_vectors.npy
+│       │   │   └── tfidf_vectors.npy
+│       └── test_dataset
+│           ├── bert_vectors.npy
+│           ├── doc2vec_vectors.npy
+│           └── tfidf_vectors.npy
 ├── notebooks
-│   └── 1.0-outlier-detection-cmmattingly.ipynb
+│   ├── 1.0-outlier-detection-exploration.ipynb
+│   └── 1.0-sen-outlier-detection.ipynb
 ├── setup.sh
 └── src
     ├── __init__.py
     ├── data
+    │   ├── extract_features.py
     │   ├── get_doc_urls.py
     │   ├── get_sen_metadata.py
-    │   └── merge_sen_statements.py
+    │   └── process_data.py
     ├── db
-    │   └── fetch_docs.py
-    ├── feature_extraction
-    │   ├── extract_features.py
-    │   └── temp_feature_extraction.ipynb
+    │   ├── fetch_docs.py
+    │   └── push_docs.py
     ├── models
     │   ├── Doc2VecTransformer.py
     │   ├── LDAMallet.py
-    │   ├── __init__.py
-    │   └── __pycache__
-    │       ├── Doc2VecTransformer.cpython-39.pyc
-    │       ├── LDAMallet.cpython-39.pyc
-    │       └── __init__.cpython-39.pyc
+    │   └── __init__.py
     ├── od
     │   ├── __init__.py
-    │   └── copod.py
+    │   ├── copod.py
+    │   └── helpers.py
     ├── scraping
     │   ├── scrape_docs.py
     │   └── scrape_sen_metadata.py
     └── utils
         ├── __init__.py
-        ├── __pycache__
-        │   ├── __init__.cpython-39.pyc
-        │   └── helpers.cpython-39.pyc
         └── helpers.py
+
 ```
 
 ## Code
