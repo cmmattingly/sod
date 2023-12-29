@@ -75,7 +75,7 @@ def lda_extract(docs):
     # get best model based on best coherence 
     model = model_list[np.argmax(coherence_values)]
     # create document topic matrix
-    doc_top_matrix = np.array([*model.load_document_topics()])
+    doc_top_matrix = np.array(*model.load_document_topics())
 
     return doc_top_matrix
 

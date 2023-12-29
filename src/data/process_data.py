@@ -43,7 +43,7 @@ def parse_args():
 
 def process_text(text):
     # lowercase text and convert to unicode
-    text = utils.to_unicode(x.lower(text))
+    text = utils.to_unicode(text.lower())
 
     # remove stop words first due to stemmed words not being included in nltk stop words
     tokens = tokenize.word_tokenize(text)
@@ -59,10 +59,7 @@ def process_text(text):
     
     return text
 
-# [TODO-3] Remove when using fetched statements
 def merge_sen_statements():
-    # [TODO]: Take into account date scraped when making corpus
-    
     # merge csv files together using filenames from glob.glob
     file_names = [file_name for file_name in glob.glob(f"data/raw/sen_statements/*.csv")]
     sen_statements = pd.concat([pd.read_csv(file_name) for file_name in file_names])

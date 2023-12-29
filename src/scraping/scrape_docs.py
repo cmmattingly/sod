@@ -66,8 +66,7 @@ def scrape_senator(df, member_id):
     def scrape_url(url):
         # scrape max 2*n urls per second (n = # of processes)
         time.sleep(1)
-
-        # check if url is valid
+        
         if not validate_url(url):
             return ''
 
@@ -113,8 +112,6 @@ def main():
 
     # find ids that we havent scraped yet
     missing_ids = find_missing_ids(member_ids)
-
-    # [TODO-1]: Base missing ids on subfolders of date scraped
 
     # scrape ids that are missing
     for i, member_id in enumerate(tqdm(missing_ids)):

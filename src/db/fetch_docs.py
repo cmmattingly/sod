@@ -19,8 +19,6 @@ def process_response(response):
         for o in json_data
     ]
 
-    # [TODO-2] process into member_id, title, date, url, text
-    
     # convert data to dataframe
     df = pd.DataFrame(parsed_data, columns=['doc_id', 'sen_id', 'title', 'url', 'text'])
     return df
